@@ -2,16 +2,22 @@ import 'package:first_project_flutter/widgets/chat_bubble.dart';
 import 'package:first_project_flutter/widgets/chat_input.dart';
 import 'package:flutter/material.dart';
 
-class ChatPage extends StatelessWidget {
+class ChatPageArguments {
   final String username;
-  const ChatPage({super.key, required this.username});
+  ChatPageArguments(this.username);
+}
+
+class ChatPage extends StatelessWidget {
+  const ChatPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final args =
+        ModalRoute.of(context)!.settings.arguments as ChatPageArguments;
     return Scaffold(
       //barra do aplicativo
       appBar: AppBar(
-        title: Text('Hi $username'),
+        title: Text('Hi ${args.username}'),
         actions: [
           IconButton(
               onPressed: () {
