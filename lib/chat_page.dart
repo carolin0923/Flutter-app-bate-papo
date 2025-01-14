@@ -1,14 +1,49 @@
+import 'dart:convert';
+
+import 'package:first_project_flutter/models/chat_message_entity.dart';
 import 'package:first_project_flutter/widgets/chat_bubble.dart';
 import 'package:first_project_flutter/widgets/chat_input.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class ChatPageArguments {
   final String username;
   ChatPageArguments(this.username);
 }
 
-class ChatPage extends StatelessWidget {
-  const ChatPage({super.key});
+class ChatPage extends StatefulWidget {
+  ChatPage({super.key});
+
+  @override
+  State<ChatPage> createState() => _ChatPageState();
+}
+
+class _ChatPageState extends State<ChatPage> {
+  //initiate state of messages
+  List<ChatMessageEntity> _messages = [];
+
+  _loadInitialMessages() async {
+    final response = await rootBundle.loadString('assets/mock_messages.json');
+
+    final List<dynamic> decodedList = jsonDecode(response) as List;
+
+    final List<ChatMessageEntity> _chatMessages = decodedList.map((listItem) {
+      return ChatMessageEntity.fromJson(listItem);
+    }).toList();
+
+    print(_chatMessages.length);
+
+    //final state of the messages
+    setState(() {
+      _messages = _chatMessages;
+    });
+  }
+
+  @override
+  void initState() {
+    _loadInitialMessages();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,13 +69,13 @@ class ChatPage extends StatelessWidget {
         children: [
           Expanded(
             child: ListView.builder(
-                itemCount: 10,
+                itemCount: _messages.length,
                 itemBuilder: (context, index) {
                   return ChatBubble(
-                      alignment: index % 2 == 0
-                          ? Alignment.centerLeft
-                          : Alignment.centerRight,
-                      message: "Hello, this is Carol!");
+                      alignment: _messages[index].author.userName == 'Carol123'
+                          ? Alignment.centerRight
+                          : Alignment.centerLeft,
+                      entity: _messages[index]);
                 }),
           ),
           ChatInput(),
