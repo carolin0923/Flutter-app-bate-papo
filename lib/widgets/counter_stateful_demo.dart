@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+// ignore: must_be_immutable
 class CounterStateful extends StatefulWidget {
   Color buttonColor;
   CounterStateful({super.key, required this.buttonColor});

@@ -1,5 +1,8 @@
 import 'package:first_project_flutter/chat_page.dart';
+import 'package:first_project_flutter/utils/spaces.dart';
+import 'package:first_project_flutter/widgets/login_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
@@ -12,7 +15,7 @@ class LoginPage extends StatelessWidget {
       print(userNameController.text);
       print(passwordController.text);
 
-      Navigator.pushNamed(context, '/chat',
+      Navigator.pushReplacementNamed(context, '/chat',
           arguments: ChatPageArguments(userNameController.text));
       print('login successful!');
     } else {
@@ -22,6 +25,9 @@ class LoginPage extends StatelessWidget {
 
   final userNameController = TextEditingController();
   final passwordController = TextEditingController();
+
+  final _mainUrl =
+      "https://medium.com/flutter-portugal/flutter-push-pop-push-8cc3b038f415";
 
   @override
   Widget build(BuildContext context) {
@@ -50,15 +56,14 @@ class LoginPage extends StatelessWidget {
                     fontSize: 20,
                     color: Colors.black),
               ),
-              Image.network(
-                  'https://revistacarro.com.br/wp-content/uploads/2018/05/mini_cooper_s_cabrio.jpg',
-                  height: 150),
+              Image.asset('assets/illustration.png', height: 150),
 
               Form(
                 key: formkey,
                 child: Column(
                   children: [
-                    TextFormField(
+                    LoginTextField(
+                      hintText: "Enter your username",
                       validator: (value) {
                         if (value != null &&
                             value.isNotEmpty &&
@@ -70,29 +75,18 @@ class LoginPage extends StatelessWidget {
                         return null;
                       },
                       controller: userNameController,
-                      decoration: InputDecoration(
-                          hintText: 'Add your username',
-                          hintStyle: TextStyle(color: Colors.blueGrey),
-                          border: OutlineInputBorder()),
                     ),
-                    SizedBox(
-                      height: 24,
-                    ),
-                    TextFormField(
+                    verticalSpacing(24),
+                    LoginTextField(
+                      hasAsterisks: true,
                       controller: passwordController,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                          hintText: 'Type your password',
-                          hintStyle: TextStyle(color: Colors.blueGrey),
-                          border: OutlineInputBorder()),
+                      hintText: 'Enter your password',
                     ),
                   ],
                 ),
               ),
 
-              SizedBox(
-                height: 24,
-              ),
+              verticalSpacing(24),
 
               ElevatedButton(
                 onPressed: () {
@@ -104,16 +98,26 @@ class LoginPage extends StatelessWidget {
               ),
 
               GestureDetector(
-                onTap: () {
+                onTap: () async {
                   print('Link clicked!');
+                  // ignore: deprecated_member_use
+                  if (!await launch(_mainUrl)) {
+                    throw 'Could not launch this';
+                  }
                 },
                 child: Column(
                   children: [
                     Text('Find us on'),
-                    Text('https://carol1532.com'),
+                    Text(_mainUrl),
                   ],
                 ),
               ),
+
+              /*Row(
+                children: [
+                  
+                ],
+              ) */ //aqui nesse escopo tentei add os icones de rede social na tela de login, mas preciso baixar as dependencias do codigo aberto de outra pessoa
             ],
           ),
         ),
