@@ -1,7 +1,10 @@
 import 'package:first_project_flutter/chat_page.dart';
+import 'package:first_project_flutter/providers/provider_counter.dart';
+import 'package:first_project_flutter/services/autho_service.dart';
 import 'package:first_project_flutter/utils/spaces.dart';
 import 'package:first_project_flutter/widgets/login_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class LoginPage extends StatelessWidget {
@@ -10,16 +13,26 @@ class LoginPage extends StatelessWidget {
   final formkey = GlobalKey<FormState>();
 
   //TODO: Validate email and username values
-  void loginUser(context) {
+  void loginUser(BuildContext context) {
     if (formkey.currentState != null && formkey.currentState!.validate()) {
-      print(userNameController.text);
-      print(passwordController.text);
+      final username = userNameController.text;
+      final password = passwordController.text;
 
-      Navigator.pushReplacementNamed(context, '/chat',
-          arguments: ChatPageArguments(userNameController.text));
-      print('login successful!');
+      bool isValidUser = AuthService.users.any((user) =>
+          user['username'] == username && user['password'] == password);
+
+      if (isValidUser) {
+        Navigator.pushReplacementNamed(
+          context,
+          '/chat',
+          arguments: ChatPageArguments(username),
+        );
+        print('Login successful!');
+      } else {
+        print('Invalid username or password');
+      }
     } else {
-      print('not successful');
+      print('Form validation failed');
     }
   }
 
@@ -39,6 +52,7 @@ class LoginPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              Text('${context.watch<ProviderCounter>().count}'),
               Text('Let\'s sign you in!',
                   textAlign: TextAlign.center,
                   style: TextStyle(
@@ -93,6 +107,15 @@ class LoginPage extends StatelessWidget {
                   loginUser(context);
                 },
                 child: Text('Login',
+                    style:
+                        TextStyle(fontSize: 24, fontWeight: FontWeight.w300)),
+              ),
+
+              ElevatedButton(
+                onPressed: () {
+                  context.read<ProviderCounter>().increment();
+                },
+                child: Text('implentar',
                     style:
                         TextStyle(fontSize: 24, fontWeight: FontWeight.w300)),
               ),

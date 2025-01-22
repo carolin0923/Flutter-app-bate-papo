@@ -1,12 +1,26 @@
+import 'package:first_project_flutter/models/chat_message_entity.dart';
 import 'package:flutter/material.dart';
 
 class ChatInput extends StatelessWidget {
-  ChatInput({super.key});
+  final Function(ChatMessageEntity) onSubmit;
+  final String currentUsername;
+
+  ChatInput({super.key, required this.onSubmit, required this.currentUsername});
 
   final chatMessageController = TextEditingController();
 
   void onSendButtonPressed() {
     print('ChatMessage: ${chatMessageController.text}');
+
+    //            criando um novo objeto para a nova mensagem que o usuario digitar
+    final newChatMessage = ChatMessageEntity(
+        text: chatMessageController.text,
+        id: "244",
+        createdAt: DateTime.now().millisecondsSinceEpoch,
+        author: Author(userName: currentUsername));
+
+    //aqui o whidget filho está acionando o metodo do pai no chat_page
+    onSubmit(newChatMessage);
   }
 
   @override

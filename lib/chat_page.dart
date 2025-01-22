@@ -39,6 +39,12 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
+  //criar um metodo aqui no whidget pai e o chat input que é o whidget filho chamar esse metodo la
+  onMessageSent(ChatMessageEntity entity) {
+    _messages.add(entity);
+    setState(() {});
+  }
+
   @override
   void initState() {
     _loadInitialMessages();
@@ -49,9 +55,12 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     final args =
         ModalRoute.of(context)!.settings.arguments as ChatPageArguments;
+
     return Scaffold(
       //barra do aplicativo
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         title: Text('Hi ${args.username}'),
         actions: [
           IconButton(
@@ -72,13 +81,18 @@ class _ChatPageState extends State<ChatPage> {
                 itemCount: _messages.length,
                 itemBuilder: (context, index) {
                   return ChatBubble(
-                      alignment: _messages[index].author.userName == 'Carol123'
-                          ? Alignment.centerRight
-                          : Alignment.centerLeft,
-                      entity: _messages[index]);
+                    alignment: _messages[index].author.userName == args.username
+                        ? Alignment.centerRight
+                        : Alignment.centerLeft,
+                    entity: _messages[index],
+                    currentUsername: args.username,
+                  );
                 }),
           ),
-          ChatInput(),
+          ChatInput(
+            onSubmit: onMessageSent,
+            currentUsername: args.username,
+          ),
         ],
       ),
     );
