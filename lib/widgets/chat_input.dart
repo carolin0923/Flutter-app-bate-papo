@@ -15,7 +15,7 @@ class ChatInput extends StatelessWidget {
     //            criando um novo objeto para a nova mensagem que o usuario digitar
     final newChatMessage = ChatMessageEntity(
         text: chatMessageController.text,
-        id: "244",
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
         createdAt: DateTime.now().millisecondsSinceEpoch,
         author: Author(userName: currentUsername));
 
@@ -32,6 +32,7 @@ class ChatInput extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           IconButton(
+            //BOTAO DE ADCIONAR
             onPressed: () {},
             icon: Icon(Icons.add, color: Colors.white),
           ),

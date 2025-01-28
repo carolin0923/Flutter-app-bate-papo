@@ -1,6 +1,5 @@
 import 'package:first_project_flutter/chat_page.dart';
-import 'package:first_project_flutter/providers/provider_counter.dart';
-import 'package:first_project_flutter/services/autho_service.dart';
+import 'package:first_project_flutter/providers/provider_authProvider.dart';
 import 'package:first_project_flutter/utils/spaces.dart';
 import 'package:first_project_flutter/widgets/login_text_field.dart';
 import 'package:flutter/material.dart';
@@ -10,34 +9,42 @@ import 'package:url_launcher/url_launcher.dart';
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
 
-  final formkey = GlobalKey<FormState>();
+  final formkey = GlobalKey<
+      FormState>(); //criando uma intancia, que está criando uma refrencia global que vai ser usada pra acessar o estado do formulario
+  final userNameController = TextEditingController();
+  final passwordController = TextEditingController();
 
   //TODO: Validate email and username values
-  void loginUser(BuildContext context) {
+  void loginUser(BuildContext context) async {
     if (formkey.currentState != null && formkey.currentState!.validate()) {
       final username = userNameController.text;
       final password = passwordController.text;
 
-      bool isValidUser = AuthService.users.any((user) =>
-          user['username'] == username && user['password'] == password);
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
-      if (isValidUser) {
-        Navigator.pushReplacementNamed(
-          context,
-          '/chat',
-          arguments: ChatPageArguments(username),
+      try {
+        if (await authProvider.loginUser(username, password)) {
+          Navigator.pushReplacementNamed(context, '/chat',
+              arguments: ChatPageArguments(username));
+          print('Login successful for $username!');
+        } else {
+          // Exibe um alerta para credenciais inválidas
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Invalid username or password')),
+          );
+        }
+      } catch (e) {
+        print('Login error: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Something went wrong, try again later.')),
         );
-        print('Login successful!');
-      } else {
-        print('Invalid username or password');
       }
     } else {
-      print('Form validation failed');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please fix the errors in the form.')),
+      );
     }
   }
-
-  final userNameController = TextEditingController();
-  final passwordController = TextEditingController();
 
   final _mainUrl =
       "https://medium.com/flutter-portugal/flutter-push-pop-push-8cc3b038f415";
@@ -52,7 +59,6 @@ class LoginPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text('${context.watch<ProviderCounter>().count}'),
               Text('Let\'s sign you in!',
                   textAlign: TextAlign.center,
                   style: TextStyle(
@@ -111,15 +117,6 @@ class LoginPage extends StatelessWidget {
                         TextStyle(fontSize: 24, fontWeight: FontWeight.w300)),
               ),
 
-              ElevatedButton(
-                onPressed: () {
-                  context.read<ProviderCounter>().increment();
-                },
-                child: Text('implentar',
-                    style:
-                        TextStyle(fontSize: 24, fontWeight: FontWeight.w300)),
-              ),
-
               GestureDetector(
                 onTap: () async {
                   print('Link clicked!');
@@ -135,12 +132,6 @@ class LoginPage extends StatelessWidget {
                   ],
                 ),
               ),
-
-              /*Row(
-                children: [
-                  
-                ],
-              ) */ //aqui nesse escopo tentei add os icones de rede social na tela de login, mas preciso baixar as dependencias do codigo aberto de outra pessoa
             ],
           ),
         ),

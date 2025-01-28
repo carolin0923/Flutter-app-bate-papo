@@ -1,10 +1,14 @@
 import 'dart:convert';
 
 import 'package:first_project_flutter/models/chat_message_entity.dart';
+
 import 'package:first_project_flutter/widgets/chat_bubble.dart';
 import 'package:first_project_flutter/widgets/chat_input.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+
+import 'providers/provider_authProvider.dart';
 
 class ChatPageArguments {
   final String username;
@@ -12,7 +16,7 @@ class ChatPageArguments {
 }
 
 class ChatPage extends StatefulWidget {
-  ChatPage({super.key});
+  const ChatPage({super.key});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -27,15 +31,15 @@ class _ChatPageState extends State<ChatPage> {
 
     final List<dynamic> decodedList = jsonDecode(response) as List;
 
-    final List<ChatMessageEntity> _chatMessages = decodedList.map((listItem) {
+    final List<ChatMessageEntity> chatMessages = decodedList.map((listItem) {
       return ChatMessageEntity.fromJson(listItem);
     }).toList();
 
-    print(_chatMessages.length);
+    //print(_chatMessages.length);
 
     //final state of the messages
     setState(() {
-      _messages = _chatMessages;
+      _messages = chatMessages;
     });
   }
 
@@ -53,19 +57,21 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    final args =
-        ModalRoute.of(context)!.settings.arguments as ChatPageArguments;
+    final authProvider = Provider.of<AuthProvider>(context);
+    print(
+        'ChatPage received username: ${ModalRoute.of(context)!.settings.arguments}');
+    final args = ModalRoute.of(context)!.settings.arguments;
 
     return Scaffold(
       //barra do aplicativo
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Text('Hi ${args.username}'),
+        title: Text('Hi ${authProvider.currentUsername}'),
         actions: [
           IconButton(
               onPressed: () {
-                //TODO: Navigation back to LoginPage on logout
+                authProvider.logout();
 
                 Navigator.popAndPushNamed(context, '/');
                 print('Icon pressed');
@@ -81,17 +87,17 @@ class _ChatPageState extends State<ChatPage> {
                 itemCount: _messages.length,
                 itemBuilder: (context, index) {
                   return ChatBubble(
-                    alignment: _messages[index].author.userName == args.username
+                    alignment: _messages[index].author.userName == ''
                         ? Alignment.centerRight
                         : Alignment.centerLeft,
                     entity: _messages[index],
-                    currentUsername: args.username,
+                    currentUsername: '',
                   );
                 }),
           ),
           ChatInput(
             onSubmit: onMessageSent,
-            currentUsername: args.username,
+            currentUsername: '',
           ),
         ],
       ),
