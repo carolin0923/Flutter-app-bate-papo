@@ -1,4 +1,3 @@
-import 'package:first_project_flutter/chat_page.dart';
 import 'package:first_project_flutter/providers/provider_authProvider.dart';
 import 'package:first_project_flutter/utils/spaces.dart';
 import 'package:first_project_flutter/widgets/login_text_field.dart';
@@ -25,7 +24,7 @@ class LoginPage extends StatelessWidget {
       try {
         if (await authProvider.loginUser(username, password)) {
           Navigator.pushReplacementNamed(context, '/chat',
-              arguments: ChatPageArguments(username));
+              arguments: authProvider);
           print('Login successful for $username!');
         } else {
           // Exibe um alerta para credenciais inválidas
@@ -39,10 +38,6 @@ class LoginPage extends StatelessWidget {
           SnackBar(content: Text('Something went wrong, try again later.')),
         );
       }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please fix the errors in the form.')),
-      );
     }
   }
 

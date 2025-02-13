@@ -1,25 +1,36 @@
 import 'package:first_project_flutter/chat_page.dart';
 import 'package:first_project_flutter/login_page.dart';
+import 'package:first_project_flutter/providers/chat_provider.dart';
 import 'package:first_project_flutter/providers/provider_authProvider.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-void main() {
-  runApp(ChatApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final authProvider = AuthProvider();
+  await authProvider.loadUser();
+
+  runApp(ChatApp(authProvider: authProvider));
 }
 
 class ChatApp extends StatelessWidget {
-  const ChatApp({super.key});
+  final AuthProvider authProvider;
+
+  const ChatApp({super.key, required this.authProvider});
 
   @override
   Widget build(context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(
+          create: (_) => AuthProvider(),
+        ),
+        ChangeNotifierProvider(create: (_) => ChatProvider())
       ],
       child: MaterialApp(
-        initialRoute: '/',
+        initialRoute: authProvider.currentUsername != null ? '/chat' : '/',
         routes: {
           '/': (context) => LoginPage(),
           '/chat': (context) => ChatPage(),
@@ -28,26 +39,3 @@ class ChatApp extends StatelessWidget {
     );
   }
 }
-
-
-
-/*
-class ChatApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: "Chat App",
-      theme: ThemeData(
-          canvasColor: Colors.transparent,
-          primarySwatch: Colors.deepPurple,
-          appBarTheme: AppBarTheme(
-              backgroundColor: Colors.blue, foregroundColor: Colors.black)),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => LoginPage(),
-        '/chat': (context) => ChatPage(),
-      },
-    );
-  }
-}
-*/

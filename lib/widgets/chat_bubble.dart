@@ -1,22 +1,21 @@
-import 'package:first_project_flutter/models/chat_message_entity.dart';
+import 'package:first_project_flutter/models/chat_message.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/provider_authProvider.dart';
 
 //bolhas do chat
 class ChatBubble extends StatelessWidget {
-  final ChatMessageEntity entity;
+  final ChatMessage message;
   final Alignment alignment;
-  final String currentUsername;
 
-  const ChatBubble(
-      {super.key,
-      required this.alignment,
-      required this.entity,
-      required this.currentUsername});
+  const ChatBubble({super.key, required this.alignment, required this.message});
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
     //compare dynamically the name of the author whith the logged in user
-    bool isAuthor = entity.author.userName == currentUsername;
+    bool isAuthor = message.author.userName == authProvider.currentUsername;
 
     return Align(
       alignment: alignment,
@@ -28,12 +27,12 @@ class ChatBubble extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              entity.text,
+              message.text,
               style: TextStyle(fontSize: 20, color: Colors.white),
             ),
-            if (entity.imageUrl != null)
+            if (message.imageUrl != null)
               Image.network(
-                '${entity.imageUrl}',
+                '${message.imageUrl}',
                 height: 200,
               )
           ],

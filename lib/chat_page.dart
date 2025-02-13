@@ -1,19 +1,10 @@
-import 'dart:convert';
-
-import 'package:first_project_flutter/models/chat_message_entity.dart';
-
+import 'package:first_project_flutter/models/chat_message.dart';
+import 'package:first_project_flutter/providers/chat_provider.dart';
 import 'package:first_project_flutter/widgets/chat_bubble.dart';
 import 'package:first_project_flutter/widgets/chat_input.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-
 import 'providers/provider_authProvider.dart';
-
-class ChatPageArguments {
-  final String username;
-  ChatPageArguments(this.username);
-}
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
@@ -23,44 +14,22 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  //initiate state of messages
-  List<ChatMessageEntity> _messages = [];
-
-  _loadInitialMessages() async {
-    final response = await rootBundle.loadString('assets/mock_messages.json');
-
-    final List<dynamic> decodedList = jsonDecode(response) as List;
-
-    final List<ChatMessageEntity> chatMessages = decodedList.map((listItem) {
-      return ChatMessageEntity.fromJson(listItem);
-    }).toList();
-
-    //print(_chatMessages.length);
-
-    //final state of the messages
-    setState(() {
-      _messages = chatMessages;
-    });
-  }
-
   //criar um metodo aqui no whidget pai e o chat input que é o whidget filho chamar esse metodo la
-  onMessageSent(ChatMessageEntity entity) {
-    _messages.add(entity);
-    setState(() {});
+  onMessageSent(ChatMessage message) {
+    final chatProvider = Provider.of<ChatProvider>(context, listen: false);
   }
 
   @override
   void initState() {
-    _loadInitialMessages();
     super.initState();
+    Provider.of<ChatProvider>(context, listen: false).loadInitialMessages();
   }
 
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
-    print(
-        'ChatPage received username: ${ModalRoute.of(context)!.settings.arguments}');
-    final args = ModalRoute.of(context)!.settings.arguments;
+    final username = authProvider.currentUsername;
+    final chatProvider = Provider.of<ChatProvider>(context);
 
     return Scaffold(
       //barra do aplicativo
@@ -84,21 +53,19 @@ class _ChatPageState extends State<ChatPage> {
         children: [
           Expanded(
             child: ListView.builder(
-                itemCount: _messages.length,
+                itemCount: chatProvider.messages.length,
                 itemBuilder: (context, index) {
+                  final message = chatProvider.messages[index];
                   return ChatBubble(
-                    alignment: _messages[index].author.userName == ''
-                        ? Alignment.centerRight
-                        : Alignment.centerLeft,
-                    entity: _messages[index],
-                    currentUsername: '',
+                    alignment:
+                        message.author.userName == authProvider.currentUsername
+                            ? Alignment.centerRight
+                            : Alignment.centerLeft,
+                    message: message,
                   );
                 }),
           ),
-          ChatInput(
-            onSubmit: onMessageSent,
-            currentUsername: '',
-          ),
+          ChatInput(),
         ],
       ),
     );

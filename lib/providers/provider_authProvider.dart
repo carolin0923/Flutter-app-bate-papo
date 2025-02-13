@@ -6,9 +6,11 @@ class AuthProvider extends ChangeNotifier {
 
   String? get currentUsername => _currentUsername;
 
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+
   static final List<Map<String, String>> _users = [
     {'username': 'Caroline', 'password': 'carol1234'},
-    {'username': 'Miguel', 'password': 'Miguel1234'}
+    {'username': 'Miguel', 'password': 'miguel1234'}
   ];
 
   static List<Map<String, String>> get users => _users;
@@ -25,14 +27,36 @@ class AuthProvider extends ChangeNotifier {
 
     if (validatedUser) {
       _currentUsername = username;
+
+      // Salvar o username no SharedPreferences
+      final prefs = await _prefs;
+      await prefs.setString('username', username);
       notifyListeners();
       return true;
     }
     return false;
   }
 
-  void logout() {
+  AuthProvider() {
+    loadUser();
+  }
+
+  Future<void> loadUser() async {
+    final prefs = await _prefs;
+
+    // Recupera o username salvo, se existir
+    _currentUsername = prefs.getString('username');
+    print('User loaded: $_currentUsername');
+    notifyListeners();
+  }
+
+  void logout() async {
     _currentUsername = null;
+    final prefs = await _prefs;
+
+    // Remove o username do SharedPreferences
+    await prefs.remove('username');
+
     notifyListeners();
   }
 }

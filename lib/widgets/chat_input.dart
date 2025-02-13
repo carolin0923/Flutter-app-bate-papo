@@ -1,26 +1,38 @@
-import 'package:first_project_flutter/models/chat_message_entity.dart';
+import 'package:first_project_flutter/models/chat_message.dart';
+import 'package:first_project_flutter/providers/chat_provider.dart';
+import 'package:first_project_flutter/providers/provider_authProvider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ChatInput extends StatelessWidget {
-  final Function(ChatMessageEntity) onSubmit;
-  final String currentUsername;
-
-  ChatInput({super.key, required this.onSubmit, required this.currentUsername});
+  ChatInput({super.key});
 
   final chatMessageController = TextEditingController();
 
-  void onSendButtonPressed() {
+  void onSendButtonPressed(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final chatprovider = Provider.of<ChatProvider>(context, listen: false);
+    final messageText = chatMessageController.text.trim();
+
+    if (messageText.isEmpty) return;
+
     print('ChatMessage: ${chatMessageController.text}');
 
     //            criando um novo objeto para a nova mensagem que o usuario digitar
-    final newChatMessage = ChatMessageEntity(
-        text: chatMessageController.text,
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
+    final newMessage = ChatMessage(
+        imageUrl: ' ',
+        text: messageText,
         createdAt: DateTime.now().millisecondsSinceEpoch,
-        author: Author(userName: currentUsername));
+        author: Author(userName: authProvider.currentUsername ?? 'Anonymous'));
 
-    //aqui o whidget filho está acionando o metodo do pai no chat_page
-    onSubmit(newChatMessage);
+    print('Nova mensagem criada: ${newMessage.text}');
+    chatprovider.addMessage(newMessage).then((_) {
+      chatMessageController.clear();
+    }).catchError((e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error sending message!')),
+      );
+    });
   }
 
   @override
@@ -52,7 +64,7 @@ class ChatInput extends StatelessWidget {
 
           IconButton(
             // Botão de enviar
-            onPressed: onSendButtonPressed,
+            onPressed: () => onSendButtonPressed(context),
             icon: Icon(Icons.send, color: Colors.white),
           ),
         ],
