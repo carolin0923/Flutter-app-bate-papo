@@ -2,6 +2,7 @@ import 'package:first_project_flutter/chat_page.dart';
 import 'package:first_project_flutter/login_page.dart';
 import 'package:first_project_flutter/providers/chat_provider.dart';
 import 'package:first_project_flutter/providers/provider_authProvider.dart';
+import 'package:first_project_flutter/sign_up_page.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -30,9 +31,11 @@ class ChatApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ChatProvider())
       ],
       child: MaterialApp(
-        initialRoute: authProvider.currentUsername != null ? '/chat' : '/',
+        initialRoute:
+            authProvider.currentUserEmail != null ? '/chat' : '/signin',
         routes: {
-          '/': (context) => LoginPage(),
+          '/signin': (context) => LoginPage(),
+          '/signup': (context) => SignUpPage(),
           '/chat': (context) => ChatPage(),
         },
       ),
