@@ -6,13 +6,15 @@ class LoginTextField extends StatelessWidget {
   final String hintText;
   final FormFieldValidator<String>? validator;
   final bool hasAsterisks;
+  final TextInputType? keyboardType;
 
   const LoginTextField(
       {super.key,
       required this.controller,
       required this.hintText,
       this.validator,
-      this.hasAsterisks = false});
+      this.hasAsterisks = false,
+      this.keyboardType});
 
   @override
   Widget build(BuildContext context) {

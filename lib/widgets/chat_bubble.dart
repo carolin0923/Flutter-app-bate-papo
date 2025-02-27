@@ -15,7 +15,7 @@ class ChatBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
     //compare dynamically the name of the author whith the logged in user
-    bool isAuthor = message.author.userName == authProvider.currentUsername;
+    bool isAuthor = message.author.userName == authProvider.currentUserEmail;
 
     return Align(
       alignment: alignment,

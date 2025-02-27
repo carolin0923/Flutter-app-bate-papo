@@ -28,7 +28,7 @@ class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
-    final username = authProvider.currentUsername;
+    final username = authProvider.currentUserEmail;
     final chatProvider = Provider.of<ChatProvider>(context);
 
     return Scaffold(
@@ -36,12 +36,11 @@ class _ChatPageState extends State<ChatPage> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Text('Hi ${authProvider.currentUsername}'),
+        title: Text('Hi ${authProvider.currentUserEmail}'),
         actions: [
           IconButton(
               onPressed: () {
                 authProvider.logout();
-
                 Navigator.popAndPushNamed(context, '/');
                 print('Icon pressed');
               },
@@ -58,7 +57,7 @@ class _ChatPageState extends State<ChatPage> {
                   final message = chatProvider.messages[index];
                   return ChatBubble(
                     alignment:
-                        message.author.userName == authProvider.currentUsername
+                        message.author.userName == authProvider.currentUserEmail
                             ? Alignment.centerRight
                             : Alignment.centerLeft,
                     message: message,

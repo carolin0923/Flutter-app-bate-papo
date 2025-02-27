@@ -1,3 +1,4 @@
+import 'package:first_project_flutter/models/user_registration.dart';
 import 'package:first_project_flutter/providers/provider_authProvider.dart';
 import 'package:first_project_flutter/utils/spaces.dart';
 import 'package:first_project_flutter/widgets/login_text_field.dart';
@@ -10,26 +11,29 @@ class LoginPage extends StatelessWidget {
 
   final formkey = GlobalKey<
       FormState>(); //criando uma intancia, que está criando uma refrencia global que vai ser usada pra acessar o estado do formulario
-  final userNameController = TextEditingController();
+  final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
   //TODO: Validate email and username values
   void loginUser(BuildContext context) async {
     if (formkey.currentState != null && formkey.currentState!.validate()) {
-      final username = userNameController.text;
+      final email = emailController.text;
       final password = passwordController.text;
 
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
       try {
-        if (await authProvider.loginUser(username, password)) {
+        if (await authProvider.loginUser(email, password)) {
+          final existingUser = await authProvider.getUserByEmail(email);
+          print('usuario cadastrado: $UserRegistration');
+
           Navigator.pushReplacementNamed(context, '/chat',
               arguments: authProvider);
-          print('Login successful for $username!');
+          print('Login successful for $email!');
         } else {
           // Exibe um alerta para credenciais inválidas
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Invalid username or password')),
+            SnackBar(content: Text('Email or password Invalid ')),
           );
         }
       } catch (e) {
@@ -78,24 +82,33 @@ class LoginPage extends StatelessWidget {
                 child: Column(
                   children: [
                     LoginTextField(
-                      hintText: "Enter your username",
+                      controller: emailController,
+                      hintText: "Enter your email",
+                      keyboardType: TextInputType
+                          .emailAddress, // Teclado otimizado para email
                       validator: (value) {
-                        if (value != null &&
-                            value.isNotEmpty &&
-                            value.length < 5) {
-                          return "Your username should be more than 5 chacacters";
-                        } else if (value != null && value.isEmpty) {
-                          return "Please type your username";
+                        if (value != null && value.isEmpty) {
+                          return 'Please enter your email'; // Campo vazio
+                        } else if (value != null && !value.contains("@")) {
+                          return "Email invalid";
                         }
-                        return null;
+                        return null; //retorna o email valido
                       },
-                      controller: userNameController,
                     ),
                     verticalSpacing(24),
                     LoginTextField(
-                      hasAsterisks: true,
+                      hasAsterisks: true, //deixar a senha oculta
                       controller: passwordController,
                       hintText: 'Enter your password',
+                      validator: (value) {
+                        if (value != null && value.isEmpty) {
+                          return 'Please enter your password'; // Campo vazio
+                        }
+                        if (value != null && value.length < 6) {
+                          return 'Password must be at least 6 characters'; //senha precisa ter mais de 6 carct
+                        }
+                        return null;
+                      },
                     ),
                   ],
                 ),
@@ -108,8 +121,29 @@ class LoginPage extends StatelessWidget {
                   loginUser(context);
                 },
                 child: Text('Login',
-                    style:
-                        TextStyle(fontSize: 24, fontWeight: FontWeight.w300)),
+                    style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w300,
+                        color: Colors.blue)),
+              ),
+              SizedBox(height: 12),
+              Row(
+                //deixa os alementos lado a lado
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Do not have account?'),
+                  SizedBox(width: 6),
+                  GestureDetector(
+                    onTap: () {
+                      print('Clicked on create account');
+                      Navigator.pushNamed(context, '/signup');
+                    },
+                    child: Text(
+                      'Sign Up',
+                      style: TextStyle(color: Colors.blue),
+                    ),
+                  ),
+                ],
               ),
 
               GestureDetector(

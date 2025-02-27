@@ -23,7 +23,7 @@ class ChatInput extends StatelessWidget {
         imageUrl: ' ',
         text: messageText,
         createdAt: DateTime.now().millisecondsSinceEpoch,
-        author: Author(userName: authProvider.currentUsername ?? 'Anonymous'));
+        author: Author(userName: authProvider.currentUserEmail ?? 'Anonymous'));
 
     print('Nova mensagem criada: ${newMessage.text}');
     chatprovider.addMessage(newMessage).then((_) {

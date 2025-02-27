@@ -1,9 +1,9 @@
-import 'package:first_project_flutter/database/chat_database.dart';
+import 'package:first_project_flutter/database/app_database.dart';
 import 'package:first_project_flutter/models/chat_message.dart';
 import 'package:flutter/material.dart';
 
 class ChatProvider with ChangeNotifier {
-  final ChatDatabase _database = ChatDatabase.instance;
+  final AppDatabase _database = AppDatabase.instance;
   List<ChatMessage> _messages = [];
   bool _loadingDatabase = false;
 
