@@ -3,7 +3,6 @@ import 'package:first_project_flutter/providers/provider_authProvider.dart';
 import 'package:first_project_flutter/utils/spaces.dart';
 import 'package:first_project_flutter/widgets/login_text_field.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 class SignUpPage extends StatelessWidget {
@@ -31,8 +30,9 @@ class SignUpPage extends StatelessWidget {
         }
 
         if (await authProvider.registerUser(username, email, password)) {
-          final users = await AppDatabase.instance.getAllUsers();
-          print('usuarios cadastrados: $users');
+          userNameController.clear();
+          emailController.clear();
+          passwordController.clear();
 
           Navigator.pushReplacementNamed(context, '/signin',
               arguments: authProvider);

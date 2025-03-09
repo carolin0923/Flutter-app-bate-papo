@@ -24,11 +24,13 @@ class AppDatabase {
 
 //criar a tabela
   Future<void> _onCreate(Database database, int version) async {
+    print('Creating tables...');
     await database.execute(
         'CREATE TABLE messages (id INTEGER PRIMARY KEY, text TEXT NOT NULL, imageUrl TEXT, createdAt INTEGER NOT NULL, author TEXT NOT NULL )');
 
     await database.execute(
-        'CREATE TABLE users (id INTEGER PRIMARY KEY, username TEXT UNIQUE NULL, password TEXT NOT NULL)');
+        'CREATE TABLE users (id INTEGER PRIMARY KEY, username TEXT UNIQUE NULL, email TEXT UNIQUE NOT NULL, password TEXT NOT NULL)');
+    print('Tables created successfully.');
   }
 
   Future<Database> _initDatabase() async {
@@ -37,10 +39,10 @@ class AppDatabase {
     final dbPath = join(databasePath, databaseName);
 
     print('Initializing new database...');
-    return openDatabase(dbPath, version: 2, onCreate: _onCreate,
+    return openDatabase(dbPath, version: 3, onCreate: _onCreate,
         onUpgrade: (db, oldVersion, newVersion) async {
-      if (oldVersion < 2) {
-        await db.execute('ALTER TABLE messages ADD COLUMN imageUrl TEXT');
+      print('Upgrading database from version $oldVersion to $newVersion...');
+      if (oldVersion < 3) {
         await db.execute(
             'CREATE TABLE users (id INTEGER PRIMARY KEY, username TEXT UNIQUE NOT NULL, email TEXT UNIQUE NOT NULL, password TEXT NOT NULL)');
         print('Table users created during upgrade.');
@@ -63,7 +65,7 @@ class AppDatabase {
     return maps.map((map) => ChatMessage.fromJson(map)).toList();
   }
 
-// deletar messagens (renover mensagens pelo id)
+// deletar messagens (remover mensagens pelo id)
   Future<int> deleteMessage(int id) async {
     final db = await database;
     return await db.delete('messages', where: 'id = ?', whereArgs: [id]);
@@ -92,7 +94,7 @@ class AppDatabase {
         await db.query('users', where: 'email = ?', whereArgs: [email]);
 
     if (maps.isNotEmpty) {
-      print('user found: $email');
+      print('user found: ${maps.first}');
       return UserRegistration.fromJson(maps.first);
     }
     print('user not found: $email');

@@ -24,11 +24,9 @@ class LoginPage extends StatelessWidget {
 
       try {
         if (await authProvider.loginUser(email, password)) {
-          final existingUser = await authProvider.getUserByEmail(email);
-          print('usuario cadastrado: $UserRegistration');
-
-          Navigator.pushReplacementNamed(context, '/chat',
-              arguments: authProvider);
+          emailController.clear();
+          passwordController.clear();
+          Navigator.pushReplacementNamed(context, '/chat');
           print('Login successful for $email!');
         } else {
           // Exibe um alerta para credenciais inválidas

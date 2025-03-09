@@ -15,7 +15,7 @@ class ChatProvider with ChangeNotifier {
 
   Future<void> loadInitialMessages() async {
     _loadingDatabase = true;
-    notifyListeners();
+
     try {
       _messages = await _database.getAllMessages();
     } catch (e) {

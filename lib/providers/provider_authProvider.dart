@@ -26,11 +26,13 @@ class AuthProvider extends ChangeNotifier {
         //salvar o usuario(username) no sahred preferences
         final prefs = await _prefs;
         await prefs.setString('email', user.email);
+        print('Username saved: ${prefs.getString('email')}');
         //notifica a UI
         notifyListeners();
         return true;
+      } else {
+        return false;
       }
-      return false;
     } catch (e) {
       print('Error when doing login: $e');
       return false;
@@ -52,6 +54,7 @@ class AuthProvider extends ChangeNotifier {
 
       final newUser = UserRegistration(
           username: username, email: email, password: password);
+
       await _database.insertUser(newUser);
       print('User registered successfully: $email');
       return true;
@@ -84,7 +87,7 @@ class AuthProvider extends ChangeNotifier {
     final prefs = await _prefs;
 
     // Recupera o username salvo, se existir
-    _currentUserEmail = prefs.getString('username');
+    _currentUserEmail = prefs.getString('email');
     print('User loaded: $_currentUserEmail');
     notifyListeners();
   }
